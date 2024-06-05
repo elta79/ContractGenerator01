@@ -1,27 +1,15 @@
+import { useRef } from 'react'
 
-import { useState, useRef } from 'react'
 
-
-function Form(){
+function Form({formData, setFormData}){
 
     const form = useRef()
 
-    const [ formData, setFormData ] = useState({
-        firstName:'',
-        lastName:'',
-        dob:'',
-        edd:'',
-        insurance:'',
-        eligibilityDate:'',
-        firstVisitDate:'',
-        deductible:'',
-        coinsurance:'',
-        copay:'',
-    })
 
     function handleSubmit(e){
         e.preventDefault()
         //send to db
+        console.log(formData)
     }
 
     function handleChange(e){
@@ -159,7 +147,7 @@ function Form(){
                     />                
                 </label>
             </div>  
-            <button id='button'>Create Contract</button>          
+            {/* <button id='button'>Create Contract</button>           */}
         </form>
         </>
     )
