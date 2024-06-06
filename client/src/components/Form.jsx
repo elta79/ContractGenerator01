@@ -24,10 +24,10 @@ function Form({formData, setFormData}){
 
     return(
         <>
-        <h2>Form</h2>
-        <form ref={form} onSubmit={handleSubmit}>
-            <div>
-                <label>
+        <h2>Patient Information</h2>
+        <form ref={form} onSubmit={handleSubmit} className='grid-container-form'>
+            
+                <label className='grid-item-form'>
                     First Name: 
                     <input 
                         type="text"
@@ -38,7 +38,7 @@ function Form({formData, setFormData}){
                         required
                     />                
                 </label>
-                <label>
+                <label className='grid-item-form'>
                     Last Name: <input 
                     type="text"
                     name="lastName"
@@ -48,9 +48,8 @@ function Form({formData, setFormData}){
                     required
                     />                
                 </label>
-            </div>
-            <div>
-                <label>
+            
+                <label className='grid-item-form'>
                     DOB: <input 
                     type="date"
                     name="dob"
@@ -60,7 +59,7 @@ function Form({formData, setFormData}){
                     required
                     />                
                 </label>
-                <label>
+                <label className='grid-item-form'>
                     EDD: <input 
                     type="date"
                     name="edd"
@@ -70,9 +69,8 @@ function Form({formData, setFormData}){
                     required
                     />                
                 </label>
-            </div>
-            <div>
-                <label>
+            
+                <label className='grid-item-form'>
                     Choose insurance:
                     <select                
                         name='insurance'
@@ -87,7 +85,7 @@ function Form({formData, setFormData}){
                         <option value="cigna">Cigna</option>
                         </select>
                 </label>            
-                <label>
+                <label className='grid-item-form'>
                     Eligibility Date: 
                     <input 
                         type="date"
@@ -98,9 +96,8 @@ function Form({formData, setFormData}){
                         required
                     />                
                 </label>
-            </div>
-            <div>
-                <label>
+            
+                <label className='grid-item-form'>
                     First Visit Date: 
                     <input 
                         type="date"
@@ -111,7 +108,7 @@ function Form({formData, setFormData}){
                         required
                     />                
                 </label>
-                <label>
+                <label className='grid-item-form'>
                     Deductible: 
                     <input 
                         type="text"
@@ -122,10 +119,9 @@ function Form({formData, setFormData}){
                         required
                     />                
                 </label>
-            </div>
-            <div>
-                <label>
-                    CoInsurance: 
+            
+                <label className='grid-item-form'>
+                    Co-Insurance: 
                     <input 
                         type="text"
                         name="coinsurance"
@@ -135,8 +131,8 @@ function Form({formData, setFormData}){
                         required
                     />                
                 </label>
-                <label>
-                    Copay: 
+                <label className='grid-item-form'>
+                    Co-Pay: 
                     <input 
                         type="text"
                         name="copay"
@@ -146,7 +142,7 @@ function Form({formData, setFormData}){
                         required
                     />                
                 </label>
-            </div>  
+            
             {/* <button id='button'>Create Contract</button>           */}
         </form>
         </>

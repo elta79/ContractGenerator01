@@ -9,12 +9,18 @@ function Contract({firstName, lastName, edd, insurance, eligibilityDate, firstVi
                 <p>Logo</p>
             </div>
             <div className='grid-container'>
-                <div className='grid-item'>Name: {firstName} {lastName}</div>
-                <div className='grid-item'>Insurance: {insurance}</div>
-                <div className='grid-item'>Eligibility Date: {eligibilityDate}</div>
-                <div className='grid-item'>Deductible: ${deductible}</div>
-                <div className='grid-item'>Co-Insurance: ${coinsurance}</div>
-                <div className='grid-item'>Co-Pay: ${copay}</div>
+                <div className='grid-item row-odd col-bold'>Name:</div>
+                <div className='grid-item row-odd'>{firstName} {lastName}</div>
+                <div className='grid-item row-odd col-bold'>Insurance:</div>
+                <div className='grid-item row-odd'>{insurance}</div>
+                <div className='grid-item row-even col-bold'>Eligibility Date:</div>
+                <div className='grid-item row-even'>{eligibilityDate}</div>
+                <div className='grid-item row-even col-bold'>Deductible:</div>
+                <div className='grid-item row-even'>${deductible}</div>
+                <div className='grid-item row-odd col-bold'>Co-Insurance:</div>
+                <div className='grid-item row-odd'>${coinsurance}</div>
+                <div className='grid-item row-odd col-bold'>Co-Pay:</div>
+                <div className='grid-item row-odd'>${copay}</div>
             </div>
             <div className='contract-container'>
                 <h3>Please carefully read the following and initial at the bottom.  By initialing, you are confirming that you have read and understand the following.  If you do not understand, please ask FBC staff for more information.</h3>

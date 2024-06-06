@@ -42,7 +42,7 @@ h1 {
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: rgb(163, 163, 245);
+  background-color: #064bd3;
   cursor: pointer;
   transition: border-color 0.25s;
 }
@@ -53,10 +53,67 @@ h1 {
 form button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 } */
-form{
-  background-color: pink;
-  display:flex;
-  flex-direction: column;
+
+/** FORM **/
+.grid-container-form{
+  display: grid;  
+  grid-template-columns: 1fr 1fr ;
+  grid-template-rows: 2em 2em 2em 2em 2em ;
+  background-color:#064bd3;
+  row-gap: 10px;
+  padding: 10px 0;
+}
+.grid-item-form{
+  box-sizing: border-box;
+  display: flex;
+  margin:0;
+}
+label{
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  text-align: right;
+  width: 400px;
+  line-height: 26px;
+  margin-bottom: 10px;
+  color:white;
+  text-shadow: 1px 1px 1px darkblue;
+}
+input, select{
+  flex: 0 0 200px;
+  margin-left: 10px;
+  padding: 8px;
+}
+select{  
+  flex: 0 0 220px;  
+}
+
+/** CONTRACT **/
+.grid-container {  
+  background-color: rgb(255, 255, 255);
+  display: grid;
+  grid-template-columns: 0.75fr 1fr 0.75fr 0.75fr;
+  grid-template-rows: 2em 2em 2em;
+  align-items: center;
+  justify-content: start;
+  border: 1px solid #dad9d9;
+  width: 100%;
+}
+.grid-item {
+  box-sizing: border-box;
+  justify-self: start;
+  align-self: stretch;
+  height: 100%;
+  width: 100%;
+  background-size: contain;
+  padding-left: 1em;
+  padding-top:3px;
+}
+.row-odd{
+  background-color: #dad9d9;  
+}
+.col-bold{
+  font-weight:bold;
 }
 
 @media (prefers-color-scheme: light) {
