@@ -1,6 +1,9 @@
 import PaySchedule from "./PaySchedule"
 
-function Contract({firstName, lastName, edd, insurance, eligibilityDate, firstVisitDate, deductible, coinsurance, copay}){
+function Contract({formData}){
+
+    const { firstName,lastName, dob, edd, insurance, eligibilityDate, firstVisitDate, deductible, coinsurance, copay }= formData
+
     return(
         <>
             <div>
@@ -56,7 +59,15 @@ function Contract({firstName, lastName, edd, insurance, eligibilityDate, firstVi
                 <p>Date</p>             
             </div>
             
-            <PaySchedule />
+            <PaySchedule 
+                edd={edd}
+                insurance={insurance}
+                eligibilityDate={eligibilityDate}
+                firstVisitDate={firstVisitDate}
+                deductible={deductible}
+                coinsurance={coinsurance}
+                copay={copay}
+            />
         </>
     )
 }

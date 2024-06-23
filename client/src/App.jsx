@@ -28,7 +28,7 @@ function App() {
 
       <div className='contract-section'>   
         {/* spread operator ... spreads props to component     */}
-        <Contract {...formData}/>
+        <Contract formData={formData}/>
       </div>
       
 
