@@ -1,5 +1,24 @@
-function PaySchedule({ edd }){
+function PaySchedule({ edd, insurance, eligibilityDate, firstVisitDate, deductible, coinsurance, copay }){
+    const registrationFee = 500
+    const childbirthClass = 200
+    const breastfeedingClass = 50
+    const birthRehearsal = 90
+    const doulaFee = 475
+    const consultObFee = 150
+    const bcbsHmoNonCoveredFee = 129.62
 
+    const insuranceRates = [
+        {ins: "bcbsHMO", allowable: 3250.68},
+        {ins: "bcbsBO", allowable: 3279.31},
+        {ins: "bcbsPPO", allowable: 3948.68},
+        {ins: "aetna", allowable: 4993.60},
+        {ins: "cigna", allowable: 4222.00},
+    ]
+    const selectedInsurance = insuranceRates.find(rate => rate.ins === insurance)
+    const allowableAmt = selectedInsurance ? selectedInsurance.allowable : 'Not Available'
+    // const selectedInsurance = insuranceRates.filter(rate => rate.ins === insurance)
+    // console.log(selectedInsurance[0].allowable)
+    
     const deadlineCalc = (edd) => {
         // TEST
         // //RegEx to check "YYYY-MM-DD" format
@@ -18,14 +37,10 @@ function PaySchedule({ edd }){
         const deadlineInMilliSeconds = eddDateInMilliSeconds - (8 * OneWeekMilliSeconds)
         const deadlineDate = new Date(deadlineInMilliSeconds).toLocaleDateString()
 
-        if(!edd){
-            return('')
-        }
-        return deadlineDate
-        
+        return (!edd ? 'Not entered yet' : deadlineDate)   
     }
     
-
+    
     return(
         <>
         <h2>Payment Schedule:</h2>
@@ -35,7 +50,7 @@ function PaySchedule({ edd }){
         </p>
         <p>Family Birth Services, Inc. accepts cash, checks and all major credit cards.</p>
         <p>I will be 32 weeks on: {deadlineCalc(edd)}</p>
-        
+        <p>Your allowable: {allowableAmt} </p>
         </>
     )
 }
