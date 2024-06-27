@@ -78,7 +78,7 @@ function Form({formData, setFormData}){
                         value={formData.insurance}
                         onChange={handleChange}
                     >
-                        <option value="--" selected>--</option>
+                        <option value="--">--</option>
                         <option value="bcbsHMO">BCBS HMO</option>
                         <option value="bcbsBO">BCBS BO</option>
                         <option value="bcbsPPO">BCBS PPO</option>

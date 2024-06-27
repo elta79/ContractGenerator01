@@ -1,10 +1,10 @@
 function PaySchedule({ edd, insurance, eligibilityDate, firstVisitDate, deductible, coinsurance, copay }){
-    const registrationFee = 500
-    const childbirthClass = 200
-    const breastfeedingClass = 50
-    const birthRehearsal = 90
-    const doulaFee = 475
-    const consultObFee = 150
+    const registrationFee = 500.00
+    const childbirthClass = 200.00
+    const breastfeedingClass = 50.00
+    const birthRehearsal = 90.00
+    const doulaFee = 475.00
+    const consultObFee = 150.00
     const bcbsHmoNonCoveredFee = 129.62
 
     const insuranceRates = [
@@ -14,6 +14,7 @@ function PaySchedule({ edd, insurance, eligibilityDate, firstVisitDate, deductib
         {ins: "aetna", allowable: 4993.60},
         {ins: "cigna", allowable: 4222.00},
     ]
+
     const selectedInsurance = insuranceRates.find(rate => rate.ins === insurance)
     const allowableAmt = selectedInsurance ? selectedInsurance.allowable : 'Not Available'
     // const selectedInsurance = insuranceRates.filter(rate => rate.ins === insurance)
@@ -39,6 +40,8 @@ function PaySchedule({ edd, insurance, eligibilityDate, firstVisitDate, deductib
 
         return (!edd ? 'Not entered yet' : deadlineDate)   
     }
+
+   
     
     
     return(
@@ -50,7 +53,80 @@ function PaySchedule({ edd, insurance, eligibilityDate, firstVisitDate, deductib
         </p>
         <p>Family Birth Services, Inc. accepts cash, checks and all major credit cards.</p>
         <p>I will be 32 weeks on: {deadlineCalc(edd)}</p>
-        <p>Your allowable: {allowableAmt} </p>
+        <div className='wrapper'>
+            <div className='schedule-title  underline'>Billable to Insurance</div>
+            <div className='col-1'>Insurance Allowable for Care</div>
+            <div className='col-2 shade-background'></div>
+            <div className='col-3 shade-background'></div>
+            <div className='col-4'>$ {allowableAmt}</div>
+            <div className='col-1'>My Deductible</div>
+            <div className='col-2'>-</div>
+            <div className='col-3'>$ {deductible}</div>
+            <div className='col-4'>$ {allowableAmt - deductible}</div>
+            <div className='col-1'>My Co-Insurance</div>
+            <div className='col-2'>x</div>
+            <div className='col-3'>{coinsurance} %</div>
+            <div className='col-4'>$ balance</div>
+            <div className='col-1'>My Deductible</div>
+            <div className='col-2'>+</div>
+            <div className='col-3'>$ {deductible}</div>
+            <div className='col-4'>$ balance</div>
+            <div className='col-1'>My Co-Pay</div>
+            <div className='col-2'>+</div>
+            <div className='col-3'>$ {copay}</div>
+            <div className='col-4'>$ balance</div>
+
+            <div className='schedule-title'>Not Billable to Insurance</div>
+            <div className='col-1'>Registration Fee (Non-Refundable)</div>
+            <div className='col-2'>+</div>
+            <div className='col-3'>$ {registrationFee}</div>
+            <div className='col-4'>$ balance</div>
+            <div className='col-1'>Consulting Ob Fee</div>
+            <div className='col-2'>+</div>
+            <div className='col-3'>$ {consultObFee}</div>
+            <div className='col-4'>$ balance</div>
+            <div className='col-1'>Childbirth Class</div>
+            <div className='col-2'>+</div>
+            <div className='col-3'>$ {childbirthClass}</div>
+            <div className='col-4'>$ balance</div>
+            <div className='col-1'>Breastfeeding Class</div>
+            <div className='col-2'>+</div>
+            <div className='col-3'>$ {breastfeedingClass}</div>
+            <div className='col-4'>$ balance</div>
+            <div className='col-1'>Birth Rehearsal</div>
+            <div className='col-2'>+</div>
+            <div className='col-3'>$ {birthRehearsal}</div>
+            <div className='col-4'>$ balance</div>
+            <div className='col-1'>Doula Fee</div>
+            <div className='col-2'>+</div>
+            <div className='col-3'>$ {doulaFee}</div>
+            <div className='col-4'>$ balance</div>
+            <div className='col-1'>Non-Covered Mom & Baby Visits</div>
+            <div className='col-2'>+</div>
+            <div className='col-3'>$ {bcbsHmoNonCoveredFee}</div>
+            <div className='col-4'>$ balance</div>
+            
+            <div className='schedule-title'>Monthly Payment Schedule</div>
+            <div className='col-1 bold'>Payment Number</div>
+            <div className='col-2 bold'>Date</div>
+            <div className='col-3 bold'>Payment Amount</div>
+            <div className='col-4 bold'>Balance</div>
+            <div className='col-1 shade-background'></div>
+            <div className='col-2 shade-background'></div>
+            <div className='col-3'>Total Due</div>
+            <div className='col-4 bold'>$ total</div>
+            <div className='col-1'>Registration Deposit</div>
+            <div className='col-2'></div>
+            <div className='col-3'>$ {registrationFee -450}</div>
+            <div className='col-4'>$ new balance</div>
+            <div className='col-1'>Registration Balance</div>
+            <div className='col-2'></div>
+            <div className='col-3'>$ {registrationFee - 50}</div>
+            <div className='col-4'>$ new balance</div>
+
+            {/* dynamically add rows based on time left before deadline */}
+
+        </div>
         </>
     )
 }
