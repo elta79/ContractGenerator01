@@ -3,9 +3,10 @@ function PaySchedule({ edd, insurance, eligibilityDate, firstVisitDate, deductib
     const childbirthClass = 200.00
     const breastfeedingClass = 50.00
     const birthRehearsal = 90.00
-    const doulaFee = 475.00
+    const doulaFee = 495.00
     const consultObFee = 150.00
     const bcbsHmoNonCoveredFee = 129.62
+    let progress = []  
 
     const insuranceRates = [
         {ins: "bcbsHMO", allowable: 3250.68},
@@ -17,6 +18,48 @@ function PaySchedule({ edd, insurance, eligibilityDate, firstVisitDate, deductib
 
     const selectedInsurance = insuranceRates.find(rate => rate.ins === insurance)
     const allowableAmt = selectedInsurance ? selectedInsurance.allowable : 'Not Available'
+   
+
+    const operations = [ 
+        ['subtractDed', deductible], 
+        ['multiplyCoIns', coinsurance], 
+        ['addDed', deductible], 
+        ['addCopay', copay] 
+    ]
+    const result = calculateBalance(allowableAmt, operations)
+    
+
+// **Calculate balance and record calculation progress ??TODO- put into useEffect fxn? TODO: use mapping instead of switch fxn
+    function calculateBalance(allowableAmt, operations){
+            
+        let value = allowableAmt        
+        // let progress = [value]        
+
+        operations.forEach(([operation, number])=>{
+            switch (operation){
+                case 'subtractDed':                
+                    value -= number
+                    break
+                case 'multiplyCoIns':
+                    value *= (number/100)
+                    break
+                case 'addDed':
+                    value += Number(number)
+                    break
+                case 'addCopay':
+                    value += Number(number)
+                    break
+                default:
+                    throw new Error("Invalid operation")
+            }
+            progress.push(value)
+        })
+        return {finalVal: value, progress}
+    }
+    
+
+    console.log("final val: ", result.finalVal)
+    console.log("prog", result.progress)
     // const selectedInsurance = insuranceRates.filter(rate => rate.ins === insurance)
     // console.log(selectedInsurance[0].allowable)
     
@@ -62,19 +105,19 @@ function PaySchedule({ edd, insurance, eligibilityDate, firstVisitDate, deductib
             <div className='col-1'>My Deductible</div>
             <div className='col-2'>-</div>
             <div className='col-3'>$ {deductible}</div>
-            <div className='col-4'>$ {allowableAmt - deductible}</div>
+            <div className='col-4'>$ {progress[0]}</div>
             <div className='col-1'>My Co-Insurance</div>
             <div className='col-2'>x</div>
             <div className='col-3'>{coinsurance} %</div>
-            <div className='col-4'>$ balance</div>
+            <div className='col-4'>$ {progress[1]}</div>
             <div className='col-1'>My Deductible</div>
             <div className='col-2'>+</div>
             <div className='col-3'>$ {deductible}</div>
-            <div className='col-4'>$ balance</div>
+            <div className='col-4'>$ {progress[2]}</div>
             <div className='col-1'>My Co-Pay</div>
             <div className='col-2'>+</div>
             <div className='col-3'>$ {copay}</div>
-            <div className='col-4'>$ balance</div>
+            <div className='col-4'>$ {progress[3]}</div>
 
             <div className='schedule-title'>Not Billable to Insurance</div>
             <div className='col-1'>Registration Fee (Non-Refundable)</div>
