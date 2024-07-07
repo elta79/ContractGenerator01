@@ -112,7 +112,7 @@ function Form({formData, setFormData}){
                 <label className='grid-item-form'>
                     Deductible: 
                     <input 
-                        type="text"
+                        type="number"
                         name="deductible"
                         className="deductible"
                         value={formData.deductible}

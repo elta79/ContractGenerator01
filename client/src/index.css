@@ -120,7 +120,7 @@ select{
 .wrapper {
   display: grid;
   width: 80%;
-  grid-template-columns: 1.5fr .5fr 1fr;
+  grid-template-columns: 1.75fr .5fr 1fr;
   
 }
 .schedule-title{

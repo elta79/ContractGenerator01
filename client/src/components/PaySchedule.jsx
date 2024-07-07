@@ -5,9 +5,12 @@ function PaySchedule({ edd, insurance, eligibilityDate, firstVisitDate, deductib
     const birthRehearsal = 90.00
     const doulaFee = 495.00
     const consultObFee = 150.00
-    const bcbsHmoNonCoveredFee = 129.62
+    const bcHmoNonCoveredVisit = 129.62
+    const initDeposit = 50.00
+    const regBalance = registrationFee - initDeposit
+        
     let progress = []  
-
+    
     const insuranceRates = [
         {ins: "bcbsHMO", allowable: 3250.68},
         {ins: "bcbsBO", allowable: 3279.31},
@@ -15,53 +18,66 @@ function PaySchedule({ edd, insurance, eligibilityDate, firstVisitDate, deductib
         {ins: "aetna", allowable: 4993.60},
         {ins: "cigna", allowable: 4222.00},
     ]
-
     const selectedInsurance = insuranceRates.find(rate => rate.ins === insurance)
     const allowableAmt = selectedInsurance ? selectedInsurance.allowable : 'Not Available'
+    const nonCoveredFees = insurance === "bcbsHMO" ?  (bcHmoNonCoveredVisit*2) : 0
+    
    
+   //key-val dictionary of operations
+    const operationsMap = {
+        subtractDed: (value, number) => value - number,
+        multiplyCoIns: (value, number) => value * (number/100),
+        addDed: (value, number) => value + number,
+        addCopay: (value, number) => value + number, 
+        addRegFee: (value, number) => value + number, 
+        addConsultFee: (value, number) => value + number, 
+        addChildbirthClass: (value, number) => value + number, 
+        addBreastfeedingClass: (value, number) => value + number, 
+        addBirthRehearsal: (value, number) => value + number, 
+        addDoulaFee: (value, number) => value + number, 
+        addNonCovered: (value, number) => value + number, 
+        subtractInitDeposit: (value, number) => value - number,
+        subtractRegBalance: (value, number) => value - number
+    }
+    function calculateBalance(allowableAmt, operations){
+        let value = allowableAmt
 
+        operations.forEach(([operation, number]) => {
+            number = Number(number) //make sure each number is a number type
+
+            if(operationsMap[operation]){
+                value = operationsMap[operation](value, number)
+            }else{
+                throw new Error('Invalid operation')
+            }
+            progress.push(value)
+        });
+        return { finalVal: value, progress }
+
+    }
     const operations = [ 
         ['subtractDed', deductible], 
         ['multiplyCoIns', coinsurance], 
         ['addDed', deductible], 
-        ['addCopay', copay] 
+        ['addCopay', copay],
+        ['addRegFee', registrationFee],
+        ['addConsultFee', consultObFee],
+        ['addChildbirthClass', childbirthClass],
+        ['addBreastfeedingClass', breastfeedingClass],
+        ['addBirthRehearsal', birthRehearsal],
+        ['addDoulaFee', doulaFee],
+        ['addNonCovered', nonCoveredFees],
+        ['subtractInitDeposit', initDeposit],
+        ['subtractRegBalance', regBalance]
     ]
+
     const result = calculateBalance(allowableAmt, operations)
     
-
-// **Calculate balance and record calculation progress ??TODO- put into useEffect fxn? TODO: use mapping instead of switch fxn
-    function calculateBalance(allowableAmt, operations){
-            
-        let value = allowableAmt        
-        // let progress = [value]        
-
-        operations.forEach(([operation, number])=>{
-            switch (operation){
-                case 'subtractDed':                
-                    value -= number
-                    break
-                case 'multiplyCoIns':
-                    value *= (number/100)
-                    break
-                case 'addDed':
-                    value += Number(number)
-                    break
-                case 'addCopay':
-                    value += Number(number)
-                    break
-                default:
-                    throw new Error("Invalid operation")
-            }
-            progress.push(value)
-        })
-        return {finalVal: value, progress}
-    }
     
 
     console.log("final val: ", result.finalVal)
     console.log("prog", result.progress)
-    // const selectedInsurance = insuranceRates.filter(rate => rate.ins === insurance)
-    // console.log(selectedInsurance[0].allowable)
+
     
     const deadlineCalc = (edd) => {
         // TEST
@@ -123,31 +139,31 @@ function PaySchedule({ edd, insurance, eligibilityDate, firstVisitDate, deductib
             <div className='col-1'>Registration Fee (Non-Refundable)</div>
             <div className='col-2'>+</div>
             <div className='col-3'>$ {registrationFee}</div>
-            <div className='col-4'>$ balance</div>
+            <div className='col-4'>$ {progress[4]}</div>
             <div className='col-1'>Consulting Ob Fee</div>
             <div className='col-2'>+</div>
             <div className='col-3'>$ {consultObFee}</div>
-            <div className='col-4'>$ balance</div>
+            <div className='col-4'>$ {progress[5]}</div>
             <div className='col-1'>Childbirth Class</div>
             <div className='col-2'>+</div>
             <div className='col-3'>$ {childbirthClass}</div>
-            <div className='col-4'>$ balance</div>
+            <div className='col-4'>$ {progress[6]}</div>
             <div className='col-1'>Breastfeeding Class</div>
             <div className='col-2'>+</div>
             <div className='col-3'>$ {breastfeedingClass}</div>
-            <div className='col-4'>$ balance</div>
+            <div className='col-4'>$ {progress[7]}</div>
             <div className='col-1'>Birth Rehearsal</div>
             <div className='col-2'>+</div>
             <div className='col-3'>$ {birthRehearsal}</div>
-            <div className='col-4'>$ balance</div>
+            <div className='col-4'>$ {progress[8]}</div>
             <div className='col-1'>Doula Fee</div>
             <div className='col-2'>+</div>
             <div className='col-3'>$ {doulaFee}</div>
-            <div className='col-4'>$ balance</div>
-            <div className='col-1'>Non-Covered Mom & Baby Visits</div>
+            <div className='col-4'>$ {progress[9]}</div>
+            <div className='col-1'>Non-Covered Mom & Baby Visits (one each)</div>
             <div className='col-2'>+</div>
-            <div className='col-3'>$ {bcbsHmoNonCoveredFee}</div>
-            <div className='col-4'>$ balance</div>
+            <div className='col-3'>$ {nonCoveredFees}</div>
+            <div className='col-4'>$ {progress[10]}</div>
             
             <div className='schedule-title'>Monthly Payment Schedule</div>
             <div className='col-1 bold'>Payment Number</div>
@@ -157,15 +173,15 @@ function PaySchedule({ edd, insurance, eligibilityDate, firstVisitDate, deductib
             <div className='col-1 shade-background'></div>
             <div className='col-2 shade-background'></div>
             <div className='col-3'>Total Due</div>
-            <div className='col-4 bold'>$ total</div>
+            <div className='col-4 bold'>$ {progress[10]}</div>
             <div className='col-1'>Registration Deposit</div>
             <div className='col-2'></div>
-            <div className='col-3'>$ {registrationFee -450}</div>
-            <div className='col-4'>$ new balance</div>
+            <div className='col-3'>$ {initDeposit}</div>
+            <div className='col-4'>$ {progress[11]}</div>
             <div className='col-1'>Registration Balance</div>
             <div className='col-2'></div>
-            <div className='col-3'>$ {registrationFee - 50}</div>
-            <div className='col-4'>$ new balance</div>
+            <div className='col-3'>$ {regBalance}</div>
+            <div className='col-4'>$ {progress[12]}</div>
 
             {/* dynamically add rows based on time left before deadline */}
 
