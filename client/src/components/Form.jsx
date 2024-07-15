@@ -84,7 +84,7 @@ function Form({formData, setFormData}){
                         <option value="bcbsPPO">BCBS PPO</option>
                         <option value="aetna">Aetna</option>
                         <option value="cigna">Cigna</option>
-                        </select>
+                    </select>
                 </label>            
                 <label className='grid-item-form'>
                     Eligibility Date: 

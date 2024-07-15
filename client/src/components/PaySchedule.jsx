@@ -1,3 +1,5 @@
+import { useEffect, useState, useMemo } from "react"
+
 function PaySchedule({ edd, insurance, eligibilityDate, firstVisitDate, deductible, coinsurance, copay }){
     const registrationFee = 500.00
     const childbirthClass = 200.00
@@ -8,22 +10,25 @@ function PaySchedule({ edd, insurance, eligibilityDate, firstVisitDate, deductib
     const bcHmoNonCoveredVisit = 129.62
     const initDeposit = 50.00
     const regBalance = registrationFee - initDeposit
+    const nonCoveredFees = insurance === "bcbsHMO" ?  (bcHmoNonCoveredVisit*2) : 0
+    
+       
+    const [ numberOfPayments, setNumberOfPayments ] = useState(0)
+    const [ totalBalanceDue, setTotalBalanceDue ] =useState(0)
+    const [ progress, setProgress] = useState([])
         
-    let progress = []  
+  
     
     const insuranceRates = [
+        // {ins: "--", allowable: 0},
         {ins: "bcbsHMO", allowable: 3250.68},
         {ins: "bcbsBO", allowable: 3279.31},
         {ins: "bcbsPPO", allowable: 3948.68},
         {ins: "aetna", allowable: 4993.60},
         {ins: "cigna", allowable: 4222.00},
     ]
-    const selectedInsurance = insuranceRates.find(rate => rate.ins === insurance)
-    const allowableAmt = selectedInsurance ? selectedInsurance.allowable : 'Not Available'
-    const nonCoveredFees = insurance === "bcbsHMO" ?  (bcHmoNonCoveredVisit*2) : 0
-    
-   
-   //key-val dictionary of operations
+
+    //key-val dictionary of operations and values
     const operationsMap = {
         subtractDed: (value, number) => value - number,
         multiplyCoIns: (value, number) => value * (number/100),
@@ -39,54 +44,55 @@ function PaySchedule({ edd, insurance, eligibilityDate, firstVisitDate, deductib
         subtractInitDeposit: (value, number) => value - number,
         subtractRegBalance: (value, number) => value - number
     }
-    function calculateBalance(allowableAmt, operations){
-        let value = allowableAmt
 
-        operations.forEach(([operation, number]) => {
-            number = Number(number) //make sure each number is a number type
 
-            if(operationsMap[operation]){
-                value = operationsMap[operation](value, number)
-            }else{
-                throw new Error('Invalid operation')
-            }
-            progress.push(value)
-        });
-        return { finalVal: value, progress }
+    //CALCULATE TOTAL BALANCE
+    useEffect (()=>{
+        const selectedInsurance = insuranceRates.find(rate => rate.ins === insurance)
+        const allowableAmt = selectedInsurance ? selectedInsurance.allowable : 'Not Available'
 
-    }
-    const operations = [ 
-        ['subtractDed', deductible], 
-        ['multiplyCoIns', coinsurance], 
-        ['addDed', deductible], 
-        ['addCopay', copay],
-        ['addRegFee', registrationFee],
-        ['addConsultFee', consultObFee],
-        ['addChildbirthClass', childbirthClass],
-        ['addBreastfeedingClass', breastfeedingClass],
-        ['addBirthRehearsal', birthRehearsal],
-        ['addDoulaFee', doulaFee],
-        ['addNonCovered', nonCoveredFees],
-        ['subtractInitDeposit', initDeposit],
-        ['subtractRegBalance', regBalance]
-    ]
+        const operations = [ 
+            ['subtractDed', deductible], 
+            ['multiplyCoIns', coinsurance], 
+            ['addDed', deductible], 
+            ['addCopay', copay],
+            ['addRegFee', registrationFee],
+            ['addConsultFee', consultObFee],
+            ['addChildbirthClass', childbirthClass],
+            ['addBreastfeedingClass', breastfeedingClass],
+            ['addBirthRehearsal', birthRehearsal],
+            ['addDoulaFee', doulaFee],
+            ['addNonCovered', nonCoveredFees],
+            ['subtractInitDeposit', initDeposit],
+            ['subtractRegBalance', regBalance]
+        ]
 
-    const result = calculateBalance(allowableAmt, operations)
+        function calculateBalance(allowableAmt, operations){
+            let value = allowableAmt
+            let prog = []
     
+            operations.forEach(([operation, number]) => {
+                number = Number(number) //make sure each number is a number type
     
+                if(operationsMap[operation]){
+                    value = operationsMap[operation](value, number)
+                    prog.push(value)
+                }else{
+                    throw new Error('Invalid operation')
+                }
+            });
+            setProgress(prog)
+            setTotalBalanceDue(prog[12] ? prog[12] : 0)
+            
+            return value;    
+        }
 
-    console.log("final val: ", result.finalVal)
-    console.log("prog", result.progress)
+        calculateBalance(allowableAmt, operations)
 
-    
+    },[insurance, deductible, coinsurance, copay])
+
+    //CALCULATE THE DEADLINE
     const deadlineCalc = (edd) => {
-        // TEST
-        // //RegEx to check "YYYY-MM-DD" format
-        // const dateFormat = /^\d{4}-\d{2}-\d{2}$/  
-        // //check if edd matches the format
-        // if(!dateFormat.test(edd)){
-        //     return 'Not right format for date'
-        // }
         const eddDate = new Date(edd) //convert string to date obj
         const day = eddDate.getUTCDate()
         const month = eddDate.getUTCMonth()
@@ -95,13 +101,54 @@ function PaySchedule({ edd, insurance, eligibilityDate, firstVisitDate, deductib
         const OneWeekMilliSeconds = 604800000
         //edd is 40wk, deadline is 32 weeks = 40 wk - 8 wk
         const deadlineInMilliSeconds = eddDateInMilliSeconds - (8 * OneWeekMilliSeconds)
-        const deadlineDate = new Date(deadlineInMilliSeconds).toLocaleDateString()
-
-        return (!edd ? 'Not entered yet' : deadlineDate)   
+        
+        const deadlineDate = new Date(deadlineInMilliSeconds)
+       
+        return deadlineDate
     }
+    //CALCULATE THE DEADLINE MONTH
+    const deadlineMonth = (deadlineDate) => deadlineDate.getMonth()+1
 
-   
+    const deadline = useMemo(()=>{
+        if(!edd) return 'Not entered yet'
+        const deadlineDate = deadlineCalc(edd)
+        return deadlineDate.toLocaleDateString()
+    }, [edd])
+
+
+    //CALCULATE NUMBER PAYMENTS    
+    useMemo(()=>{
+        const numberOfPaymentsCalc = (deadlineMonth) =>{
+            //calc how many days left in month to determine pmt start month  
+              
+            const currentDate = new Date()
+            const currentYear = currentDate.getFullYear()
+            const currentMonth = currentDate.getMonth() //0-based month
+            const totalDaysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate()
+            const currentDayOfMonth = currentDate.getDate()
+            const percentCompleted = (currentDayOfMonth / totalDaysInMonth )
+            // console.log('percent complete:',percentCompleted)
+            
+            const firstPayment = percentCompleted > 0.75 ? (currentMonth + 2) : (currentMonth +1)
+            const calculatedNumberOfPayments = deadlineMonth - firstPayment + 1
+            
+            return calculatedNumberOfPayments
+        }
+        
+        const calculatedNumberOfPayments = numberOfPaymentsCalc(deadline)
+        setNumberOfPayments(calculatedNumberOfPayments)
+        
+    },[deadline])
     
+    
+    
+    // const amountEachPayment = (totalBalanceDue, numberOfPayments) =>{
+    //     const numPay = numberOfPayments
+    //     const totalBal = totalBalanceDue
+    //     console.log("num payments in amounteach:", numPay)
+    //     console.log("total bal", totalBal)
+    // }
+    // amountEachPayment(totalBalance, numberOfPayments)
     
     return(
         <>
@@ -111,13 +158,13 @@ function PaySchedule({ edd, insurance, eligibilityDate, firstVisitDate, deductib
             Failure to pay the balance in full by 32 weeks gestation may result in discharge from care and your account will be turned over to a collection agency.
         </p>
         <p>Family Birth Services, Inc. accepts cash, checks and all major credit cards.</p>
-        <p>I will be 32 weeks on: {deadlineCalc(edd)}</p>
+        <p>I will be 32 weeks on: {deadline}</p>
         <div className='wrapper'>
             <div className='schedule-title  underline'>Billable to Insurance</div>
             <div className='col-1'>Insurance Allowable for Care</div>
             <div className='col-2 shade-background'></div>
             <div className='col-3 shade-background'></div>
-            <div className='col-4'>$ {allowableAmt}</div>
+            <div className='col-4'>$ </div>
             <div className='col-1'>My Deductible</div>
             <div className='col-2'>-</div>
             <div className='col-3'>$ {deductible}</div>
