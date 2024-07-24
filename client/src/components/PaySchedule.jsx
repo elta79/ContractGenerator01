@@ -128,7 +128,7 @@ const calculatedNumberOfPayments = useMemo(()=>{
 
     const deadlineDate = new Date(deadline)
     const deadlineMonthValue = deadlineMonth(deadlineDate)
-    console.log('DL MONTH VAL',deadlineMonthValue)
+    // console.log('DL MONTH VAL',deadlineMonthValue)
     
     const numberOfPaymentsCalc = (deadlineMonthValue) =>{
         //calc how many days left in month to determine pmt start month         
@@ -138,10 +138,10 @@ const calculatedNumberOfPayments = useMemo(()=>{
         const totalDaysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate()
         const currentDayOfMonth = currentDate.getDate()
         const percentCompleted = (currentDayOfMonth / totalDaysInMonth )
-        console.log('percent complete:',percentCompleted)
+        // console.log('percent complete:',percentCompleted)
         
         const firstPayment = percentCompleted > 0.75 ? (currentMonth + 2) : (currentMonth +1)
-        console.log('first payment', firstPayment)
+        // console.log('first payment', firstPayment)
         return deadlineMonthValue - firstPayment +1
        
     }
@@ -157,15 +157,33 @@ useEffect(()=>{
     }
 }, [calculatedNumberOfPayments])
 
-console.log("numberOfPayments",numberOfPayments)
+// console.log("numberOfPayments",numberOfPayments)
 
+//CALCULATE RUNNING BALANCE AND PAYMENT AMOUNTS
 const amountEachPayment = useMemo(() => {
-    const numPay = numberOfPayments
-    const totalBal = totalBalanceDue
+    const paymentArray = []
     const balanceArray = []
-    //divide total balance by numPay, if this num<total balance, add num to array, if num > total balance then add balance to array
+    const numPay = numberOfPayments
+    let totalBal = totalBalanceDue
+    let newBalance
+    
+    const eachPayment =(Math.round(((totalBal/numPay)+Number.EPSILON)*100)/100).toFixed(2)
+    
+    while (totalBal > eachPayment){
+        newBalance = totalBal -= eachPayment
+        balanceArray.push(Math.round((newBalance+Number.EPSILON)*100)/100).toFixed(2) 
+        paymentArray.push(eachPayment)  
+        if(newBalance < eachPayment){
+            paymentArray.push(Math.round((newBalance+Number.EPSILON)*100)/100).toFixed(2)
+            break 
+        } 
+    }    
+    console.log('balance array', balanceArray)
+    console.log('paymentArray',paymentArray)
+  
 },[totalBalanceDue, numberOfPayments])
 
+//RENDER PAYMENTS AND CHANGING BALANCE
 
     
     return(
