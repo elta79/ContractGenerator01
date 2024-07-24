@@ -91,64 +91,82 @@ function PaySchedule({ edd, insurance, eligibilityDate, firstVisitDate, deductib
 
     },[insurance, deductible, coinsurance, copay])
 
-    //CALCULATE THE DEADLINE
-    const deadlineCalc = (edd) => {
-        const eddDate = new Date(edd) //convert string to date obj
-        const day = eddDate.getUTCDate()
-        const month = eddDate.getUTCMonth()
-        const year = eddDate.getUTCFullYear()
-        const eddDateInMilliSeconds = Date.UTC(year, month, day+1)
-        const OneWeekMilliSeconds = 604800000
-        //edd is 40wk, deadline is 32 weeks = 40 wk - 8 wk
-        const deadlineInMilliSeconds = eddDateInMilliSeconds - (8 * OneWeekMilliSeconds)
+//CALCULATE THE DEADLINE
+const deadlineCalc = (edd) => {
+    const eddDate = new Date(edd) //convert string to date obj
+    const day = eddDate.getUTCDate()
+    const month = eddDate.getUTCMonth()
+    const year = eddDate.getUTCFullYear()
+    const eddDateInMilliSeconds = Date.UTC(year, month, day+1)
+    const OneWeekMilliSeconds = 604800000
+    //edd is 40wk, deadline is 32 weeks = 40 wk - 8 wk
+    const deadlineInMilliSeconds = eddDateInMilliSeconds - (8 * OneWeekMilliSeconds)
+    
+    const deadlineDate = new Date(deadlineInMilliSeconds)
+    // console.log('deadlineDate', deadlineDate)
+    return deadlineDate
+}
+//CALCULATE THE DEADLINE MONTH
+const deadlineMonth = (deadlineDate) => {
+    if(!deadlineDate) return null
+    
+    return (deadlineDate.getMonth()+1)
+}
+
+
+//Deadline string 
+const deadline = useMemo(()=>{
+    if(!edd) return 'Not entered yet'
+    const deadlineDate = deadlineCalc(edd)
+    return deadlineDate.toLocaleDateString()
+}, [edd])
+
+
+//CALCULATE NUMBER PAYMENTS    numberOfPayments
+const calculatedNumberOfPayments = useMemo(()=>{
+    if (!deadline)return null;
+
+    const deadlineDate = new Date(deadline)
+    const deadlineMonthValue = deadlineMonth(deadlineDate)
+    console.log('DL MONTH VAL',deadlineMonthValue)
+    
+    const numberOfPaymentsCalc = (deadlineMonthValue) =>{
+        //calc how many days left in month to determine pmt start month         
+        const currentDate = new Date()
+        const currentYear = currentDate.getFullYear()
+        const currentMonth = currentDate.getMonth() //0-based month
+        const totalDaysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate()
+        const currentDayOfMonth = currentDate.getDate()
+        const percentCompleted = (currentDayOfMonth / totalDaysInMonth )
+        console.log('percent complete:',percentCompleted)
         
-        const deadlineDate = new Date(deadlineInMilliSeconds)
+        const firstPayment = percentCompleted > 0.75 ? (currentMonth + 2) : (currentMonth +1)
+        console.log('first payment', firstPayment)
+        return deadlineMonthValue - firstPayment +1
        
-        return deadlineDate
     }
-    //CALCULATE THE DEADLINE MONTH
-    const deadlineMonth = (deadlineDate) => deadlineDate.getMonth()+1
-
-    const deadline = useMemo(()=>{
-        if(!edd) return 'Not entered yet'
-        const deadlineDate = deadlineCalc(edd)
-        return deadlineDate.toLocaleDateString()
-    }, [edd])
+    // console.log("numberOfPayments",numberOfPayments)
+    return numberOfPaymentsCalc(deadlineMonthValue)
+    
+},[deadline])
 
 
-    //CALCULATE NUMBER PAYMENTS    
-    useMemo(()=>{
-        const numberOfPaymentsCalc = (deadlineMonth) =>{
-            //calc how many days left in month to determine pmt start month  
-              
-            const currentDate = new Date()
-            const currentYear = currentDate.getFullYear()
-            const currentMonth = currentDate.getMonth() //0-based month
-            const totalDaysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate()
-            const currentDayOfMonth = currentDate.getDate()
-            const percentCompleted = (currentDayOfMonth / totalDaysInMonth )
-            // console.log('percent complete:',percentCompleted)
-            
-            const firstPayment = percentCompleted > 0.75 ? (currentMonth + 2) : (currentMonth +1)
-            const calculatedNumberOfPayments = deadlineMonth - firstPayment + 1
-            
-            return calculatedNumberOfPayments
-        }
-        
-        const calculatedNumberOfPayments = numberOfPaymentsCalc(deadline)
+useEffect(()=>{
+    if (calculatedNumberOfPayments !== null){
         setNumberOfPayments(calculatedNumberOfPayments)
-        
-    },[deadline])
-    
-    
-    
-    // const amountEachPayment = (totalBalanceDue, numberOfPayments) =>{
-    //     const numPay = numberOfPayments
-    //     const totalBal = totalBalanceDue
-    //     console.log("num payments in amounteach:", numPay)
-    //     console.log("total bal", totalBal)
-    // }
-    // amountEachPayment(totalBalance, numberOfPayments)
+    }
+}, [calculatedNumberOfPayments])
+
+console.log("numberOfPayments",numberOfPayments)
+
+const amountEachPayment = useMemo(() => {
+    const numPay = numberOfPayments
+    const totalBal = totalBalanceDue
+    const balanceArray = []
+    //divide total balance by numPay, if this num<total balance, add num to array, if num > total balance then add balance to array
+},[totalBalanceDue, numberOfPayments])
+
+
     
     return(
         <>
@@ -158,7 +176,7 @@ function PaySchedule({ edd, insurance, eligibilityDate, firstVisitDate, deductib
             Failure to pay the balance in full by 32 weeks gestation may result in discharge from care and your account will be turned over to a collection agency.
         </p>
         <p>Family Birth Services, Inc. accepts cash, checks and all major credit cards.</p>
-        <p>I will be 32 weeks on: {deadline}</p>
+        <p>I will be 32 weeks on: {deadline} </p>
         <div className='wrapper'>
             <div className='schedule-title  underline'>Billable to Insurance</div>
             <div className='col-1'>Insurance Allowable for Care</div>
@@ -230,7 +248,7 @@ function PaySchedule({ edd, insurance, eligibilityDate, firstVisitDate, deductib
             <div className='col-3'>$ {regBalance}</div>
             <div className='col-4'>$ {progress[12]}</div>
 
-            {/* dynamically add rows based on time left before deadline */}
+            {/* dynamically add rows based on time left before deadline Function Call*/}
 
         </div>
         </>
