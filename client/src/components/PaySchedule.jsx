@@ -1,4 +1,5 @@
 import { useEffect, useState, useMemo } from "react"
+import PaymentField from "./PaymentField"
 
 function PaySchedule({ edd, insurance, eligibilityDate, firstVisitDate, deductible, coinsurance, copay }){
     const registrationFee = 500.00
@@ -156,36 +157,7 @@ useEffect(()=>{
         setNumberOfPayments(calculatedNumberOfPayments)
     }
 }, [calculatedNumberOfPayments])
-
-// console.log("numberOfPayments",numberOfPayments)
-
-//CALCULATE RUNNING BALANCE AND PAYMENT AMOUNTS
-const amountEachPayment = useMemo(() => {
-    const paymentArray = []
-    const balanceArray = []
-    const numPay = numberOfPayments
-    let totalBal = totalBalanceDue
-    let newBalance
-    
-    const eachPayment =(Math.round(((totalBal/numPay)+Number.EPSILON)*100)/100).toFixed(2)
-    
-    while (totalBal > eachPayment){
-        newBalance = totalBal -= eachPayment
-        balanceArray.push(Math.round((newBalance+Number.EPSILON)*100)/100).toFixed(2) 
-        paymentArray.push(eachPayment)  
-        if(newBalance < eachPayment){
-            paymentArray.push(Math.round((newBalance+Number.EPSILON)*100)/100).toFixed(2)
-            break 
-        } 
-    }    
-    console.log('balance array', balanceArray)
-    console.log('paymentArray',paymentArray)
-  
-},[totalBalanceDue, numberOfPayments])
-
-//RENDER PAYMENTS AND CHANGING BALANCE
-
-    
+   
     return(
         <>
         <h2>Payment Schedule:</h2>
@@ -267,6 +239,7 @@ const amountEachPayment = useMemo(() => {
             <div className='col-4'>$ {progress[12]}</div>
 
             {/* dynamically add rows based on time left before deadline Function Call*/}
+            <PaymentField totalBalanceDue={totalBalanceDue} numberOfPayments={numberOfPayments}/>
 
         </div>
         </>
