@@ -2,16 +2,17 @@ import { useEffect, useState, useMemo } from "react"
 import PaymentField from "./PaymentField"
 
 function PaySchedule({ edd, insurance, eligibilityDate, firstVisitDate, deductible, coinsurance, copay }){
-    const registrationFee = 500.00
-    const childbirthClass = 200.00
-    const breastfeedingClass = 50.00
-    const birthRehearsal = 90.00
-    const doulaFee = 495.00
-    const consultObFee = 150.00
+    const registrationFee = 500.00.toFixed(2)
+    const childbirthClass = 200.00.toFixed(2)
+    const breastfeedingClass = 50.00.toFixed(2)
+    const birthRehearsal = 90.00.toFixed(2)
+    const doulaFee = 495.00.toFixed(2)
+    const consultObFee = 150.00.toFixed(2)
     const bcHmoNonCoveredVisit = 129.62
-    const initDeposit = 50.00
-    const regBalance = registrationFee - initDeposit
+    const initDeposit = 50.00.toFixed(2)
+    const regBalance = (registrationFee - initDeposit).toFixed(2)
     const nonCoveredFees = insurance === "bcbsHMO" ?  (bcHmoNonCoveredVisit*2) : 0
+
     
        
     const [ numberOfPayments, setNumberOfPayments ] = useState(0)
@@ -46,11 +47,17 @@ function PaySchedule({ edd, insurance, eligibilityDate, firstVisitDate, deductib
         subtractRegBalance: (value, number) => value - number
     }
 
-
+    
+    const selectedInsurance = insuranceRates.find(rate => rate.ins === insurance)
+    const allowableAmt = selectedInsurance ? selectedInsurance.allowable : 'Not Available'
+    
+   
     //CALCULATE TOTAL BALANCE
     useEffect (()=>{
-        const selectedInsurance = insuranceRates.find(rate => rate.ins === insurance)
-        const allowableAmt = selectedInsurance ? selectedInsurance.allowable : 'Not Available'
+        // const selectedInsurance = insuranceRates.find(rate => rate.ins === insurance)
+        // const allowableAmt = selectedInsurance ? selectedInsurance.allowable : 'Not Available'
+
+        // console.log('selectedInsurance', selectedInsurance)
 
         const operations = [ 
             ['subtractDed', deductible], 
@@ -77,7 +84,7 @@ function PaySchedule({ edd, insurance, eligibilityDate, firstVisitDate, deductib
     
                 if(operationsMap[operation]){
                     value = operationsMap[operation](value, number)
-                    prog.push(value)
+                    prog.push(value.toFixed(2))
                 }else{
                     throw new Error('Invalid operation')
                 }
@@ -91,6 +98,7 @@ function PaySchedule({ edd, insurance, eligibilityDate, firstVisitDate, deductib
         calculateBalance(allowableAmt, operations)
 
     },[insurance, deductible, coinsurance, copay])
+    
 
 //CALCULATE THE DEADLINE
 const deadlineCalc = (edd) => {
@@ -129,7 +137,7 @@ const calculatedNumberOfPayments = useMemo(()=>{
 
     const deadlineDate = new Date(deadline)
     const deadlineMonthValue = deadlineMonth(deadlineDate)
-    // console.log('DL MONTH VAL',deadlineMonthValue)
+    //console.log('DL MONTH VAL',deadlineMonthValue)
     
     const numberOfPaymentsCalc = (deadlineMonthValue) =>{
         //calc how many days left in month to determine pmt start month         
@@ -142,11 +150,11 @@ const calculatedNumberOfPayments = useMemo(()=>{
         // console.log('percent complete:',percentCompleted)
         
         const firstPayment = percentCompleted > 0.75 ? (currentMonth + 2) : (currentMonth +1)
-        // console.log('first payment', firstPayment)
+        console.log('first payment', firstPayment)
         return deadlineMonthValue - firstPayment +1
        
     }
-    // console.log("numberOfPayments",numberOfPayments)
+    console.log("numberOfPayments in Pay Sch",numberOfPayments)
     return numberOfPaymentsCalc(deadlineMonthValue)
     
 },[deadline])
@@ -172,7 +180,7 @@ useEffect(()=>{
             <div className='col-1'>Insurance Allowable for Care</div>
             <div className='col-2 shade-background'></div>
             <div className='col-3 shade-background'></div>
-            <div className='col-4'>$ </div>
+            <div className='col-4'>$ {allowableAmt}</div>
             <div className='col-1'>My Deductible</div>
             <div className='col-2'>-</div>
             <div className='col-3'>$ {deductible}</div>

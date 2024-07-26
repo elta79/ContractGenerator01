@@ -1,34 +1,37 @@
 import { useMemo, Fragment  } from "react"
 function PaymentField({totalBalanceDue, numberOfPayments}){
 
-  console.log('totalBalanceDue',totalBalanceDue)
-  console.log('numberOfPayments', numberOfPayments)
+  //console.log('totalBalanceDue',totalBalanceDue)
+  //console.log('numberOfPayments', numberOfPayments)
   //CALCULATE RUNNING BALANCE AND PAYMENT AMOUNTS
   const { paymentArray, balanceArray} = useMemo(() => {
     const paymentArray = []
     const balanceArray = []
     const numPay = numberOfPayments
     let totalBal = totalBalanceDue
-    let newBalance
     
-    const eachPayment =(Math.round(((totalBal/numPay)+Number.EPSILON)*100)/100).toFixed(2)
+    //console.log('totalBal', totalBal)
+    //console.log('numPay', numPay)
     
+    const eachPayment =(Math.round(((totalBal/numPay)+Number.EPSILON)*100)/100)
+    console.log('each payment', eachPayment)
     while (totalBal > eachPayment){
-        newBalance = totalBal -= eachPayment
-        balanceArray.push(Math.round((newBalance+Number.EPSILON)*100)/100).toFixed(2) 
-        paymentArray.push(eachPayment)  
-        if(newBalance < eachPayment){
-            paymentArray.push(Math.round((newBalance+Number.EPSILON)*100)/100).toFixed(2)
-            balanceArray.push(0)
-            break 
+        totalBal -= eachPayment
+        
+        balanceArray.push(Math.round((totalBal+Number.EPSILON)*100)/100) 
+        paymentArray.push(eachPayment.toFixed(2)) 
+
+        if(totalBal < eachPayment){          
+          paymentArray.push(Math.round((totalBal+Number.EPSILON)*100)/100)
+          balanceArray.push(0)
+          break 
         } 
     }    
     return { paymentArray, balanceArray}
-    
 
 },[totalBalanceDue, numberOfPayments])
-console.log('balance array', balanceArray)
-console.log('paymentArray',paymentArray)
+//console.log('balance array', balanceArray)
+//console.log('paymentArray',paymentArray)
 
   return(
     <>
