@@ -3,6 +3,10 @@ function PaymentField({totalBalanceDue, numberOfPayments}){
 
   //console.log('totalBalanceDue',totalBalanceDue)
   //console.log('numberOfPayments', numberOfPayments)
+
+  function roundUpToHundreths(num){
+    return Math.ceil(num*100)/100
+  }
   //CALCULATE RUNNING BALANCE AND PAYMENT AMOUNTS
   const { paymentArray, balanceArray} = useMemo(() => {
     const paymentArray = []
@@ -12,9 +16,9 @@ function PaymentField({totalBalanceDue, numberOfPayments}){
     
     //console.log('totalBal', totalBal)
     //console.log('numPay', numPay)
-    
-    const eachPayment =(Math.round(((totalBal/numPay)+Number.EPSILON)*100)/100)
-    console.log('each payment', eachPayment)
+    const eachPayment = roundUpToHundreths(totalBal/numPay)
+   
+    // console.log('each payment', eachPayment)
     while (totalBal > eachPayment){
         totalBal -= eachPayment
         
