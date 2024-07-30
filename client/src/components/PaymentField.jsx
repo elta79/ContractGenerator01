@@ -11,31 +11,22 @@ function PaymentField({totalBalanceDue, numberOfPayments}){
   const { paymentArray, balanceArray} = useMemo(() => {
     const paymentArray = []
     const balanceArray = []
-    const numPay = numberOfPayments
-    let totalBal = totalBalanceDue
+    let numPay = numberOfPayments
+    let currentBal = totalBalanceDue
     
-    //console.log('totalBal', totalBal)
-    //console.log('numPay', numPay)
-    const eachPayment = roundUpToHundreths(totalBal/numPay)
-   
-    // console.log('each payment', eachPayment)
-    while (totalBal > eachPayment){
-        totalBal -= eachPayment
-        
-        balanceArray.push(Math.round((totalBal+Number.EPSILON)*100)/100) 
-        paymentArray.push(eachPayment.toFixed(2)) 
-
-        if(totalBal < eachPayment){          
-          paymentArray.push(Math.round((totalBal+Number.EPSILON)*100)/100)
-          balanceArray.push(0)
-          break 
-        } 
-    }    
+    while(numPay >0){
+      const eachPayment = currentBal/numPay
+      paymentArray.push(eachPayment.toFixed(2))
+      numPay -= 1
+      currentBal -= eachPayment
+      balanceArray.push(currentBal.toFixed(2))
+    }
+    
     return { paymentArray, balanceArray}
 
 },[totalBalanceDue, numberOfPayments])
-//console.log('balance array', balanceArray)
-//console.log('paymentArray',paymentArray)
+console.log('balance array', balanceArray)
+console.log('paymentArray',paymentArray)
 
   return(
     <>
