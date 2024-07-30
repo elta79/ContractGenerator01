@@ -12,14 +12,12 @@ function PaySchedule({ edd, insurance, eligibilityDate, firstVisitDate, deductib
     const initDeposit = 50.00.toFixed(2)
     const regBalance = (registrationFee - initDeposit).toFixed(2)
     const nonCoveredFees = insurance === "bcbsHMO" ?  (bcHmoNonCoveredVisit*2) : 0
-
     
-       
+   
     const [ numberOfPayments, setNumberOfPayments ] = useState(0)
     const [ totalBalanceDue, setTotalBalanceDue ] =useState(0)
     const [ progress, setProgress] = useState([])
-        
-  
+
     
     const insuranceRates = [
         // {ins: "--", allowable: 0},
@@ -54,9 +52,7 @@ function PaySchedule({ edd, insurance, eligibilityDate, firstVisitDate, deductib
    
     //CALCULATE TOTAL BALANCE
     useEffect (()=>{
-        // const selectedInsurance = insuranceRates.find(rate => rate.ins === insurance)
-        // const allowableAmt = selectedInsurance ? selectedInsurance.allowable : 'Not Available'
-
+        
         // console.log('selectedInsurance', selectedInsurance)
 
         const operations = [ 
@@ -122,7 +118,6 @@ const deadlineMonth = (deadlineDate) => {
     return (deadlineDate.getMonth()+1)
 }
 
-
 //Deadline string 
 const deadline = useMemo(()=>{
     if(!edd) return 'Not entered yet'
@@ -130,6 +125,21 @@ const deadline = useMemo(()=>{
     return deadlineDate.toLocaleDateString()
 }, [edd])
 
+//CALCULATE FIRST PAYMENT MONTH
+const firstPaymentMonth = () =>{
+    //calc how many days left in month to determine pmt start month         
+    const currentDate = new Date()
+    const currentYear = currentDate.getFullYear()
+    const currentMonth = currentDate.getMonth() //0-based month
+    const totalDaysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate()
+    const currentDayOfMonth = currentDate.getDate()
+
+    const percentCompleted = (currentDayOfMonth / totalDaysInMonth )
+    // console.log('percent complete:',percentCompleted)
+    
+    return percentCompleted > 0.75 ? (currentMonth + 2) : (currentMonth +1)    
+}
+console.log(firstPaymentMonth())
 
 //CALCULATE NUMBER PAYMENTS    numberOfPayments
 const calculatedNumberOfPayments = useMemo(()=>{
@@ -137,23 +147,13 @@ const calculatedNumberOfPayments = useMemo(()=>{
 
     const deadlineDate = new Date(deadline)
     const deadlineMonthValue = deadlineMonth(deadlineDate)
-    //console.log('DL MONTH VAL',deadlineMonthValue)
+    const firstMonthValue = firstPaymentMonth()
+    console.log('DL MONTH VAL',deadlineMonthValue)
     
-    const numberOfPaymentsCalc = (deadlineMonthValue) =>{
-        //calc how many days left in month to determine pmt start month         
-        const currentDate = new Date()
-        const currentYear = currentDate.getFullYear()
-        const currentMonth = currentDate.getMonth() //0-based month
-        const totalDaysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate()
-        const currentDayOfMonth = currentDate.getDate()
-        const percentCompleted = (currentDayOfMonth / totalDaysInMonth )
-        // console.log('percent complete:',percentCompleted)
-        
-        const firstPayment = percentCompleted > 0.75 ? (currentMonth + 2) : (currentMonth +1)
-        console.log('first payment', firstPayment)
-        return deadlineMonthValue - firstPayment +1
-       
+    const numberOfPaymentsCalc = (deadlineMonthValue, firstMonthValue) =>{
+        return deadlineMonthValue - firstMonthValue +1       
     }
+
     console.log("numberOfPayments in Pay Sch",numberOfPayments)
     return numberOfPaymentsCalc(deadlineMonthValue)
     
