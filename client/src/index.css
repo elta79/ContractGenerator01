@@ -120,20 +120,25 @@ select{
 .wrapper {
   display: grid;
   width: 80%;
-  grid-template-columns: 1.75fr .5fr 1fr;
+  grid-template-columns: 1.5fr .5fr 1fr;
   
 }
 .schedule-title{
   grid-column-start: 1;
   grid-column-end: span col3-end;
-  background-color:aqua;
+  background-color:rgb(98, 148, 219);
   border-bottom: 1px solid gray;
+  padding-left: 1rem;
 }
 .col-1{
   border-bottom: 1px solid gray;
+  padding-left: 1rem;
+}
+.payment-number{
+  padding-left: 4rem;
 }
 .col-2{
-  text-align: center;
+  text-align: right;
   border-bottom: 1px solid gray;
 }
 .col-3{

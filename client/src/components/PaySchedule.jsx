@@ -131,7 +131,7 @@ const firstPaymentMonth = () =>{
     const currentDate = new Date()
     const currentYear = currentDate.getFullYear()
     const currentMonth = currentDate.getMonth() //0-based month
-    const totalDaysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate()
+    const totalDaysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate() //0 is last day of prev month
     const currentDayOfMonth = currentDate.getDate()
 
     const percentCompleted = (currentDayOfMonth / totalDaysInMonth )
@@ -139,23 +139,23 @@ const firstPaymentMonth = () =>{
     
     return percentCompleted > 0.75 ? (currentMonth + 2) : (currentMonth +1)    
 }
-console.log(firstPaymentMonth())
+// console.log(firstPaymentMonth())
 
-//CALCULATE NUMBER PAYMENTS    numberOfPayments
+//CALCULATE NUMBER PAYMENTS - depends on deadline
 const calculatedNumberOfPayments = useMemo(()=>{
     if (!deadline)return null;
 
     const deadlineDate = new Date(deadline)
     const deadlineMonthValue = deadlineMonth(deadlineDate)
-    const firstMonthValue = firstPaymentMonth()
-    console.log('DL MONTH VAL',deadlineMonthValue)
-    
-    const numberOfPaymentsCalc = (deadlineMonthValue, firstMonthValue) =>{
-        return deadlineMonthValue - firstMonthValue +1       
-    }
 
+    const firstMonthValue = firstPaymentMonth()
+    // console.log('DL MONTH VAL',typeof(deadlineMonthValue))
+    // console.log('1st pmt month', typeof(firstMonthValue))
+    
+    const numberOfPaymentsCalc = Math.abs(deadlineMonthValue - firstMonthValue +1)       
+    
     console.log("numberOfPayments in Pay Sch",numberOfPayments)
-    return numberOfPaymentsCalc(deadlineMonthValue)
+    return numberOfPaymentsCalc
     
 },[deadline])
 
@@ -176,7 +176,7 @@ useEffect(()=>{
         <p>Family Birth Services, Inc. accepts cash, checks and all major credit cards.</p>
         <p>I will be 32 weeks on: {deadline} </p>
         <div className='wrapper'>
-            <div className='schedule-title  underline'>Billable to Insurance</div>
+            <div className='schedule-title  underline bold'>Billable to Insurance</div>
             <div className='col-1'>Insurance Allowable for Care</div>
             <div className='col-2 shade-background'></div>
             <div className='col-3 shade-background'></div>
@@ -198,7 +198,7 @@ useEffect(()=>{
             <div className='col-3'>$ {copay}</div>
             <div className='col-4'>$ {progress[3]}</div>
 
-            <div className='schedule-title'>Not Billable to Insurance</div>
+            <div className='schedule-title bold'>Not Billable to Insurance</div>
             <div className='col-1'>Registration Fee (Non-Refundable)</div>
             <div className='col-2'>+</div>
             <div className='col-3'>$ {registrationFee}</div>
@@ -228,7 +228,7 @@ useEffect(()=>{
             <div className='col-3'>$ {nonCoveredFees}</div>
             <div className='col-4'>$ {progress[10]}</div>
             
-            <div className='schedule-title'>Monthly Payment Schedule</div>
+            <div className='schedule-title bold'>Monthly Payment Schedule</div>
             <div className='col-1 bold'>Payment Number</div>
             <div className='col-2 bold'>Date</div>
             <div className='col-3 bold'>Payment Amount</div>
@@ -247,7 +247,11 @@ useEffect(()=>{
             <div className='col-4'>$ {progress[12]}</div>
 
             {/* dynamically add rows based on time left before deadline Function Call*/}
-            <PaymentField totalBalanceDue={totalBalanceDue} numberOfPayments={numberOfPayments}/>
+            <PaymentField 
+                totalBalanceDue={totalBalanceDue} 
+                numberOfPayments={numberOfPayments}
+                firstPaymentMonth={firstPaymentMonth()}
+            />
 
         </div>
         </>
