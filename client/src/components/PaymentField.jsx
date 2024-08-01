@@ -1,43 +1,81 @@
 import { useMemo, Fragment  } from "react"
-function PaymentField({totalBalanceDue, numberOfPayments}){
+function PaymentField({totalBalanceDue, numberOfPayments, firstPaymentMonth}){
 
-  //console.log('totalBalanceDue',totalBalanceDue)
-  //console.log('numberOfPayments', numberOfPayments)
-
-  function roundUpToHundreths(num){
-    return Math.ceil(num*100)/100
-  }
+  // console.log('totalBalanceDue',totalBalanceDue)
+  // console.log('numberOfPayments', numberOfPayments)
+  
   //CALCULATE RUNNING BALANCE AND PAYMENT AMOUNTS
-  const { paymentArray, balanceArray} = useMemo(() => {
+  const { paymentArray, balanceArray, dateArray} = useMemo(() => {
     const paymentArray = []
     const balanceArray = []
+    const dateArray = []
+    
+    
     let numPay = numberOfPayments
     let currentBal = totalBalanceDue
+    let currentPaymentMonth = firstPaymentMonth
+    // console.log("paymentArray",paymentArray)
+    // console.log("balanceArray",balanceArray)
+    // console.log("dateArray",dateArray)
     
-    while(numPay >0){
+    while(numPay > 0){
       const eachPayment = currentBal/numPay
+      if(currentPaymentMonth > 12 ){
+        currentPaymentMonth=1
+      }
       paymentArray.push(eachPayment.toFixed(2))
+      dateArray.push(currentPaymentMonth)
       numPay -= 1
-      currentBal -= eachPayment
+      currentBal -= eachPayment      
+      currentPaymentMonth += 1
       balanceArray.push(currentBal.toFixed(2))
     }
-    
-    return { paymentArray, balanceArray}
+    return { paymentArray, balanceArray,dateArray}
 
-},[totalBalanceDue, numberOfPayments])
-console.log('balance array', balanceArray)
-console.log('paymentArray',paymentArray)
+  },[totalBalanceDue, numberOfPayments])
+
+  // console.log("paymentArray",paymentArray)
+  // console.log("balanceArray",balanceArray)
+  // console.log("dateArray",dateArray)
+
+  const { yearArray }= useMemo(()=>{
+    //if month is less than current month, then current year + 1
+    const yearArray = []
+    const currentDate = new Date()
+    const currentYear = currentDate.getFullYear()
+    const currentMonth = currentDate.getMonth()+1 //0-based month
+    
+
+    for(let i=0; i < dateArray.length; i++){
+
+      if( currentMonth < dateArray[i] || currentMonth === dateArray[i]){
+        yearArray.push(currentYear)
+                
+      }else{
+        yearArray.push(currentYear + 1)                
+      }
+    }
+
+    return {yearArray}
+    
+  },[dateArray])
+
+  // console.log('balance array', balanceArray)
+  // console.log('paymentArray',paymentArray)
+  // console.log('date Array', dateArray)
+  // console.log('year array', yearArray)
 
   return(
     <>
       {paymentArray.map((payment,index) =>{
         return(
-        < Fragment key={index} >
-          <div className='col-1'>{index+1}</div>
-          <div className='col-2'>Date</div>
-          <div className='col-3'>{payment}</div>
-          <div className='col-4'>{balanceArray[index]}</div>
-        </Fragment>)
+          < Fragment key={index} >
+            <div className='col-1 payment-number'>{index+1}</div>
+            <div className='col-2'>{dateArray[index]}/{yearArray[index]} </div>
+            <div className='col-3'>$ {payment}</div>
+            <div className='col-4'>$ {balanceArray[index]}</div>
+          </Fragment> 
+        )
       })}
     </>
   )
