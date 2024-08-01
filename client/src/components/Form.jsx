@@ -5,7 +5,6 @@ function Form({formData, setFormData}){
 
     const form = useRef()
 
-
     function handleSubmit(e){
         e.preventDefault()
         //send to db

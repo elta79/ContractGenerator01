@@ -5,10 +5,10 @@ function PaymentField({totalBalanceDue, numberOfPayments, firstPaymentMonth}){
   // console.log('numberOfPayments', numberOfPayments)
   
   //CALCULATE RUNNING BALANCE AND PAYMENT AMOUNTS
-  const { paymentArray, balanceArray, dateArray} = useMemo(() => {
+  const { paymentArray, balanceArray, monthArray} = useMemo(() => {
     const paymentArray = []
     const balanceArray = []
-    const dateArray = []
+    const monthArray = []
     
     
     let numPay = numberOfPayments
@@ -24,13 +24,13 @@ function PaymentField({totalBalanceDue, numberOfPayments, firstPaymentMonth}){
         currentPaymentMonth=1
       }
       paymentArray.push(eachPayment.toFixed(2))
-      dateArray.push(currentPaymentMonth)
+      monthArray.push(currentPaymentMonth)
       numPay -= 1
       currentBal -= eachPayment      
       currentPaymentMonth += 1
       balanceArray.push(currentBal.toFixed(2))
     }
-    return { paymentArray, balanceArray,dateArray}
+    return { paymentArray, balanceArray,monthArray}
 
   },[totalBalanceDue, numberOfPayments])
 
@@ -46,9 +46,9 @@ function PaymentField({totalBalanceDue, numberOfPayments, firstPaymentMonth}){
     const currentMonth = currentDate.getMonth()+1 //0-based month
     
 
-    for(let i=0; i < dateArray.length; i++){
+    for(let i=0; i < monthArray.length; i++){
 
-      if( currentMonth < dateArray[i] || currentMonth === dateArray[i]){
+      if( currentMonth < monthArray[i] || currentMonth === monthArray[i]){
         yearArray.push(currentYear)
                 
       }else{
@@ -58,7 +58,7 @@ function PaymentField({totalBalanceDue, numberOfPayments, firstPaymentMonth}){
 
     return {yearArray}
     
-  },[dateArray])
+  },[monthArray])
 
   // console.log('balance array', balanceArray)
   // console.log('paymentArray',paymentArray)
@@ -71,7 +71,7 @@ function PaymentField({totalBalanceDue, numberOfPayments, firstPaymentMonth}){
         return(
           < Fragment key={index} >
             <div className='col-1 payment-number'>{index+1}</div>
-            <div className='col-2'>{dateArray[index]}/{yearArray[index]} </div>
+            <div className='col-2'>{monthArray[index]}/{yearArray[index]} </div>
             <div className='col-3'>$ {payment}</div>
             <div className='col-4'>$ {balanceArray[index]}</div>
           </Fragment> 

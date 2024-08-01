@@ -3,7 +3,16 @@ import PaySchedule from "./PaySchedule"
 function Contract({formData}){
 
     const { firstName,lastName, dob, edd, insurance, eligibilityDate, firstVisitDate, deductible, coinsurance, copay }= formData
-
+        
+    const formatDate = (dateString) =>{
+        console.log('STring', dateString)
+        const [year, month, day] = dateString.split('-')
+        const paddedMonth = month.padStart(2,'0')
+        const paddedDay = day.padStart(2,'0')
+        const date = new Date(year, paddedMonth-1, paddedDay)        
+        return`${paddedMonth}/${paddedDay}/${year}`
+    }
+    formatDate(eligibilityDate)
     return(
         <>
             <div>
@@ -17,7 +26,7 @@ function Contract({formData}){
                 <div className='grid-item row-odd col-bold'>Insurance:</div>
                 <div className='grid-item row-odd'>{insurance}</div>
                 <div className='grid-item row-even col-bold'>Eligibility Date:</div>
-                <div className='grid-item row-even'>{eligibilityDate}</div>
+                <div className='grid-item row-even'>{formatDate(eligibilityDate)}</div>
                 <div className='grid-item row-even col-bold'>Deductible:</div>
                 <div className='grid-item row-even'>$ {deductible}</div>
                 <div className='grid-item row-odd col-bold'>Co-Insurance:</div>

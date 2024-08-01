@@ -12,7 +12,7 @@ function PaySchedule({ edd, insurance, eligibilityDate, firstVisitDate, deductib
     const initDeposit = 50.00.toFixed(2)
     const regBalance = (registrationFee - initDeposit).toFixed(2)
     const nonCoveredFees = insurance === "bcbsHMO" ?  (bcHmoNonCoveredVisit*2) : 0
-    
+   
    
     const [ numberOfPayments, setNumberOfPayments ] = useState(0)
     const [ totalBalanceDue, setTotalBalanceDue ] =useState(0)
@@ -147,11 +147,7 @@ const calculatedNumberOfPayments = useMemo(()=>{
 
     const deadlineDate = new Date(deadline)
     const deadlineMonthValue = deadlineMonth(deadlineDate)
-
-    const firstMonthValue = firstPaymentMonth()
-    // console.log('DL MONTH VAL',typeof(deadlineMonthValue))
-    // console.log('1st pmt month', typeof(firstMonthValue))
-    
+    const firstMonthValue = firstPaymentMonth()    
     const numberOfPaymentsCalc = Math.abs(deadlineMonthValue - firstMonthValue +1)       
     
     console.log("numberOfPayments in Pay Sch",numberOfPayments)
